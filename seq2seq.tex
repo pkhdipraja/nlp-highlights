@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{cite}
 \usepackage{setspace}
+\usepackage{indentfirst}
 \setlength{\parskip}{10pt}
 \title{Sequence to Sequence Modelling}
 \author{Patrick Kahardipraja}
@@ -19,24 +20,27 @@
 % Explain distributional representation?
 % Tell about Google NMT?
 % encoder - decoder
-%The idea of machine translation is central to.
+% transformer
+% FOCUS ON DEVELOPMENT OF SEQ2SEQ OVER TIME AND HOW IT CHANGES
 
 Mapping of a sequence to another sequence is an important paradigm because of the vast amount of problems that can be formulated in this manner. For instance, in automatic speech recognition (ASR), chunks of speech signals can be mapped to sequence of phonemes while in machine translation, a sequence of words in one language can be mapped to another language. Interestingly, many other tasks such as text summarization, question answering, and image caption generation can be phrased as a sequence to sequence problem. In this paper, I will attempt to distill how sequence to sequence learning works and the motivation behind it, with a particular focus on machine translation.
 
 
 \section*{Introduction}
 
-Brief about SMT..(Prior to NMT)NN dead in 1990s. Resurgence of Deep Neural Networks (DNNs) in the last few years have been attributed to gpu power and availability of good dataset (ImageNet). Equipped with the capability to learn features automatically with multiple levels of representation, DNNs are already proven to achieve excellent performance on task such as object recognition (AlexNet). However, although powerful.. 
+%Brief about SMT..(Prior to NMT)NN dead in 1990s. Resurgence of Deep Neural Networks (DNNs) in the last few years have been attributed to gpu power and availability of good dataset (ImageNet). Equipped with the capability to learn features automatically with multiple levels of representation, DNNs are already proven to achieve excellent performance on task such as object recognition (AlexNet). However, although powerful.. 
 
 Prior to neural machine translation (NMT), phrase-based stastistical machine translation (SMT) systems are widely used as it offers reliable performance. Despite its success, most of them are extremely complex and require a huge amount of effort, as it is often tailored to a specific language pair and do not generalize well to another languages. Furthermore, a lot of feature engineering are required in order to capture a specific language phenomena, which prompt researchers to explore another approach.
 
-The resurgence of deep neural networks (DNNs) in early 2010s, thanks to faster, parallel computation using GPUs and availability of large and high-quality datasets, bring a new wave of enthusiasm in deep models. With the capability to learn features automatically with multiple, hierarchical representation, DNNs achieve excellent performance on difficult tasks in computer vision [AlexNet] and speech recognition []. Albeit powerful, DNNs has its own limitation, as
+The resurgence of deep neural networks (DNNs) in early 2010s, thanks to faster, parallel computation using GPUs and availability of large and high-quality datasets, bring a new wave of enthusiasm in deep models. With the capability to learn features automatically with multiple, hierarchical representation, DNNs achieve excellent performance on difficult tasks in computer vision [AlexNet] and speech recognition []. Albeit powerful, DNNs has its own limitation, as it requires input and output vectors with a fixed dimension and thus not suitable for sequence to sequence problem whose lengths are unknown beforehand. In addition, DNNs also do not generalize well across temporal patterns, because each neuron has its own specific connection and as a result, a single pattern may look totally different at different timesteps.
+
+The natural remedy for this problem is to look onto recurrent neural networks (RNNs), as it allows operations over sequences of vectors. However, mapping using RNNs typically have one-to-one correspondence between the input vectors and the output vectors. It also has another problem, as the input and output sequences can have different lengths and non-monotonic alignments. Standard RNN architecture is also not reliable for learning long-range dependencies due to the vanishing gradient problem. This issue is addressed by Sutskever et al. [Seq2Seq], where they introduce a novel and straightforward method to solve general sequence to sequence mapping using Long-Short Term Memory (LSTM) architecture. With the success of sequence to sequence learning in machine translation tasks, research in neural machine translation continue to thrive, eventually resulting in many significant improvements such as attention mechanism [Bahdanau] and subword units to deal with rare words [WordPiece]. But, before delving in too deep, I will give some brief insight into the mechanism behind RNN in the next section. 
 
 
 
  
 
-\section*{Recurrent Neural Networks}
+\section*{Recurrent Neural Networks} % Discuss variants of RNN, LSTM, GRU?
 
 \section*{Seq2Seq Model}
 The first work [Cho et al.]
