@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{cite}
 \usepackage{setspace}
+\usepackage{amsmath}
 \usepackage{indentfirst}
 \setlength{\parskip}{10pt}
 \title{Sequence to Sequence Modelling}
@@ -22,6 +23,7 @@
 % encoder - decoder
 % transformer
 % FOCUS ON DEVELOPMENT OF SEQ2SEQ OVER TIME AND HOW IT CHANGES
+% Recent Advances: Facebook - Phrase-Based & Neural Unsupervised Machine Translation -> discuss that smt is not dead
 
 Mapping of a sequence to another sequence is an important paradigm because of the vast amount of problems that can be formulated in this manner. For instance, in automatic speech recognition (ASR), chunks of speech signals can be mapped to sequence of phonemes while in machine translation, a sequence of words in one language can be mapped to another language. Interestingly, many other tasks such as text summarization, question answering, and image caption generation can be phrased as a sequence to sequence problem. In this paper, I will attempt to distill how sequence to sequence learning works and the motivation behind it, with a particular focus on machine translation.
 
@@ -40,12 +42,15 @@ The natural remedy for this problem is to look onto recurrent neural networks (R
 
  
 
-\section*{Recurrent Neural Networks} % Discuss variants of RNN, LSTM, GRU?
+\section*{Recurrent Neural Networks} % Discuss variants of RNN, LSTM, LSTM highway, GRU?
+
+Recurrent neural networks [Rumelhart] are type of neural network that is able to process arbitrary sequential input via combination of its internal state and input vector. At every timestep $t$, the hidden state vector $h_{t}$ is overwritten as a function of the hidden state at the previous timestep $h_{t-1}$ and the current input vector $x_{t}$. The input vector $x_{t}$ itself could be a representation of $t$-th word in a sentence, which is usually obtained using pre-trained word embeddings [GloVe, Word2Vec, ElMo]. The hidden state of RNNs can be perceived as a memory with a fixed dimensionality that can be tuned, containing distributed representation of the processed input sequence up to time $t$.
+
 
 \section*{Seq2Seq Model}
 The first work [Cho et al.]
 
-\section*{Recent Advances} % also include problems with Seq2Seq?
+\section*{Recent Advances} % & related work. also include problems with Seq2Seq?
 
 \section*{Conclusion}
 \end{document}
