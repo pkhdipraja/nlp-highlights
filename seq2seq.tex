@@ -46,7 +46,7 @@ The natural remedy for this problem is to look onto recurrent neural networks (R
 
 Recurrent neural networks [Rumelhart] are type of neural network that is able to process arbitrary sequential input via combination of its internal state and input vector. At every timestep $t$, the hidden state vector $h_{t}$ is overwritten as a function of the hidden state at the previous timestep $h_{t-1}$ and the current input vector $x_{t}$. The input vector $x_{t}$ itself could be a representation of $t$-th word in a sentence, which is usually obtained using pre-trained word embeddings [GloVe, Word2Vec, ElMo]. The hidden state of RNNs can be perceived as a memory with a fixed dimensionality that can be tuned, containing distributed representation of the processed input sequence up to time $t$.
 
-In a RNN, the forward step function consists of an affine transformation followed by non-linear activation function. The hidden state then can be used to make predictions:
+In a RNN, the forward step function consists of an affine transformation followed by a non-linear activation function. The hidden state then can be used to make predictions:
 \begin{align*}
 h_{t} &= a(W_{x}x_{t} + W_{h}h_{t-1} + b_{h})\\
 y_{t} &= g(W_{y}h_{t} + b_{y}) 
@@ -54,6 +54,8 @@ y_{t} &= g(W_{y}h_{t} + b_{y})
 where in a typical application, $a$ is the hyperbolic tangent function and $g$ is the softmax function.
 
 Insert pic of RNN and LSTM!!
+
+Although proven to be effective, RNN still has its own shortcoming. The main problem with RNN is that during training, magnitude of gradient can get weaker or stronger exponentially when backpropagating the error through time, especially with long sequences [Hochreiter, Bengio]. This phenomena is called vanishing or exploding gradient problem, which causes RNN model to experience difficulty when handling "long-term dependencies" that occur in a sequence.
 
 
 
