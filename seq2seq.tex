@@ -53,9 +53,12 @@ y_{t} &= g(W_{y}h_{t} + b_{y})
 \end{align*}
 where in a typical application, $a$ is the hyperbolic tangent function and $g$ is the softmax function.
 
-Insert pic of RNN and LSTM!!
-
 Although proven to be effective, RNN still has its own shortcoming. The main problem with RNN is that during training, magnitude of gradient can get weaker or stronger exponentially when backpropagating the error through time, especially with long sequences [Hochreiter, Bengio]. This phenomena is called vanishing or exploding gradient problem, which causes RNN model to experience difficulty when handling "long-term dependencies" that occur in a sequence.
+
+Long Short Term Memory (LSTM) architecture [Hochreiter and Schmidhuber] addresses the problem of "long-term dependencies" by integrating a memory cell that is capable to memorize state that span over long sequences of time. The memory cell is controlled by gates, which have the ability to regulate how much information are added or removed in the memory cell. This means that while in a RNN a completely new hidden state is computed at every new timestep, in LSTM the hidden state is not competely overwritten, and updated according to the memory cell. The architecture of both RNNs and LSTMs are depicted in figure...  
+
+A LSTM unit consists of 3 gates (input gate $i_{t}$, forget gate $f_{t}$, output gate $o_{t}$), memory cell $c_{t}$ and hidden state $h_{t}$. In a high-level sense, the input gate decides how much and which values will be updated, the forget gate controls the amount of information to be forgotten in the previous memory cell, and the output gate decides the hidden state by filtering the internal memory cell for each timestep. Each gate produces vectors, where the values are between 0 (completely closed) and 1 (completely open) using the sigmoid activation function. Formula and explanation..
+
 
 
 
