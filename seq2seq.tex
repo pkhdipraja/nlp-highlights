@@ -74,12 +74,11 @@ where $x_{t}$ is the input vector for timestep $t$, $\sigma$ is the sigmoid acti
 %GRU, LSTM with peephole
 Beside the standard LSTM architecture in literature that is introduced above, there also exist several popular variants which are commonly used. One of the variations which is introduced by [Gers, Schmidhueber] use "peephole connections". These connections allow the gates to look into the memory cell state in order to learn precise and stable timings. 
 
-Other notable LSTM variants is the Gated Recurrent Unit (GRU), introduced by [Cho et al.]
+Other notable LSTM variants is the Gated Recurrent Unit (GRU), introduced by [Cho et al.]. Unlike LSTM, GRU is less complex and requires less computation. GRU only have 2 gates, the update gate that decides how much information will be transferred from previous and candidate hidden state to the current one and reset gate that controls to what extent the previous hidden state will affect the candidate hidden state. In this manner, the update gate can be thought as a combination of input and forget gates of LSTM unit. This architecture also merges the internal memory cell and hidden state of LSTM into a single hidden state.
 
-
-
+% Add part for MT?Seems Cho et al. paper for GRU has a bit of reference for SMT
 \section*{Seq2Seq Model}
-The first work [Cho et al.]
+The first model that is able to map a sentence into a vector and then to its translation is introduced by [Kalchbrenner et al.]. The model, which they called Recurrent Continuous Translation Models, is composed of 2 separate parts: convolutional neural network for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
 
 \section*{Recent Advances} % & related work. also include problems with Seq2Seq?
 
