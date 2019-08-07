@@ -1,6 +1,10 @@
 \documentclass[12pt]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage{cite}
+\usepackage{graphicx}
+\usepackage{subfig}
+
+\graphicspath{ {/home/patrick/Pictures/} }
 \usepackage{setspace}
 \usepackage{amsmath}
 \usepackage{indentfirst}
@@ -55,7 +59,16 @@ where in a typical application, $a$ is the hyperbolic tangent function and $g$ i
 
 Although proven to be effective, RNN still has its own shortcoming. The main problem with RNN is that during training, magnitude of gradient can get weaker or stronger exponentially when backpropagating the error through time, especially with long sequences [Hochreiter, Bengio]. This phenomena is called vanishing or exploding gradient problem, which causes RNN model to experience difficulty when handling "long-term dependencies" that occur in a sequence.
 
-Long Short Term Memory (LSTM) architecture [Hochreiter and Schmidhuber] addresses the problem of "long-term dependencies" by integrating a memory cell that is capable to memorize state that span over long sequences of time. The memory cell is controlled by gates, which have the ability to regulate how much information are added or removed in the memory cell. This means that while in a RNN a completely new hidden state is computed at every new timestep, in LSTM the hidden state is not competely overwritten, and updated according to the memory cell. The architecture of both RNNs and LSTMs are depicted in figure...  
+Long Short Term Memory (LSTM) architecture [Hochreiter and Schmidhuber] addresses the problem of "long-term dependencies" by integrating a memory cell that is capable to memorize state that span over long sequences of time. The memory cell is controlled by gates, which have the ability to regulate how much information are added or removed in the memory cell. This means that while in a RNN a completely new hidden state is computed at every new timestep, in LSTM the hidden state is not competely overwritten, and updated according to the memory cell. The architecture of both RNNs and LSTMs are depicted in Figure \ref{fig:rnn}.
+\begin{figure}[h]
+\centering
+\subfloat[RNN unit]{\includegraphics[scale=1.25]{rnn}}
+
+\subfloat[LSTM unit, colah]{\includegraphics[scale=1.4]{lstm}}
+
+\caption{Architecture of RNN (a) and LSTM (b)}
+\label{fig:rnn}
+\end{figure}
 
 A LSTM unit consists of 3 gates (input gate $i_{t}$, forget gate $f_{t}$, output gate $o_{t}$), memory cell $C_{t}$ and hidden state $h_{t}$. In a high-level sense, the input gate decides how much and which values will be updated, the forget gate controls the amount of information to be forgotten in the previous memory cell, and the output gate decides the hidden state by filtering the internal memory cell for each timestep. Each gate produces vectors, where their values are between 0 (completely closed) and 1 (completely open) using the sigmoid activation function. 
 
@@ -78,7 +91,20 @@ Other notable LSTM variants is the Gated Recurrent Unit (GRU), introduced by [Ch
 
 % Add part for MT?Seems Cho et al. paper for GRU has a bit of reference for SMT
 \section*{Seq2Seq Model}
-The first model that is able to map a sentence into a vector and then to its translation is introduced by [Kalchbrenner et al.]. The model, which they called Recurrent Continuous Translation Models, is composed of 2 separate parts: convolutional neural network for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
+% Kalchbrenner and Cho 3 pg. max!!
+The first model that is able to map a sentence into a vector and then to its translation is introduced by [Kalchbrenner et al.]. The model, which they called Recurrent Continuous Translation Models (RCTM), is composed of 2 separate parts: convolutional neural network for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
+% How convolutional layers work, how RNN LM works. Explain 1d Conv in context of CSM.Advantage and disadvantage of RCTM. Explain Cho et al. model. Explain encoder-decoder from Kalchbrenner thesis
+
+The Recurrent Continuous Translation Models estimate the probability distribution over the sentence in the target language given sentences in the source language. Suppose that there exist a target sentence $f = f_{1},f_{2},...,f_{m}$, which is a translation of source sentence $e = e_{1}, e_{2},...,e_{n}$. Then $P(f|e)$ can be obtained with the formula:
+\begin{align*}
+P(f|e) = \prod_{i=1}^{m} P(f_{i}|f_{1:i-1}, e)
+\end{align*}
+
+As can be seen in the formulation above, the model estimates $P(f|e)$ by calculating the conditional probability $P(f_{i}|f_{1:i-1}, e)$ for every translated word occuring at position $i$, given the preceding generated words $f_{1:i-1}$ in the target sentence and the source sentence $e$. Conditioning the translation model to the preceding target words also ensure that it incorporates the target language model [Kalchbrenner et al.].
+
+In RCTM, prediction of the target sentence use a language model based on a recurrent neural network [Mikolov et al.]. The recurrent language model predict the $i$-th word of the target sentence depending on all the previous generated words $f_{1:i-1}$, making no Markov assumption about the words dependencies in the target sentence. However, using the standard RNN architecture makes the prediction to be strongly affected by words close to $f_{i}$ and weakly influenced by long-range dependencies that occur in the target language due to the nature of RNN.
+
+Describe RLM. dreaming
 
 \section*{Recent Advances} % & related work. also include problems with Seq2Seq?
 
