@@ -51,10 +51,10 @@ The natural remedy for this problem is to look onto recurrent neural networks (R
 Recurrent neural networks [Rumelhart] are type of neural network that is able to process arbitrary sequential input via combination of its internal state and input vector. At every timestep $t$, the hidden state vector $h_{t}$ is overwritten as a function of the hidden state at the previous timestep $h_{t-1}$ and the current input vector $x_{t}$. The input vector $x_{t}$ itself could be a representation of $t$-th word in a sentence, which is usually obtained using pre-trained word embeddings [GloVe, Word2Vec, ElMo]. The hidden state of RNNs can be perceived as a memory with a fixed dimensionality that can be tuned, containing distributed representation of the processed input sequence up to time $t$.
 
 In a RNN, the forward step function consists of an affine transformation followed by a non-linear activation function. The hidden state then can be used to make predictions:
-\begin{align*}
+\begin{align}
 h_{t} &= a(W^{(x)}x_{t} + W^{(h)}h_{t-1} + b_{h})\\
 y_{t} &= g(W^{(y)}h_{t} + b_{y}) 
-\end{align*}
+\end{align}
 where in a typical application, $a$ is the hyperbolic tangent function and $g$ is the softmax function.
 
 Although proven to be effective, RNN still has its own shortcoming. The main problem with RNN is that during training, magnitude of gradient can get weaker or stronger exponentially when backpropagating the error through time, especially with long sequences [Hochreiter, Bengio]. This phenomena is called vanishing or exploding gradient problem, which causes RNN model to experience difficulty when handling "long-term dependencies" that occur in a sequence.
@@ -73,14 +73,14 @@ Long Short Term Memory (LSTM) architecture [Hochreiter and Schmidhuber] addresse
 A LSTM unit consists of 3 gates (input gate $i_{t}$, forget gate $f_{t}$, output gate $o_{t}$), memory cell $C_{t}$ and hidden state $h_{t}$. In a high-level sense, the input gate decides how much and which values will be updated, the forget gate controls the amount of information to be forgotten in the previous memory cell, and the output gate decides the hidden state by filtering the internal memory cell for each timestep. Each gate produces vectors, where their values are between 0 (completely closed) and 1 (completely open) using the sigmoid activation function. 
 
 The formula of LSTM is described with the following equations:
-\begin{align*}
+\begin{align}
 i_{t} &= \sigma(W^{(i)}x_{t} + U^{(i)}h_{t-1} + b_{i}) \\
 f_{t} &= \sigma(W^{(f)}x_{t} + U^{(f)}h_{t-1} + b_{f}) \\
 o_{t} &= \sigma(W^{(o)}x_{t} + U^{(o)}h_{t-1} + b_{o}) \\
 \tilde{C}_{t} &= \textnormal{tanh}(W^{(c)}x_{t} + U^{(c)}h_{t-1} + b_{c}) \\
 C_{t} &= f_{t} \odot C_{t-1} + i_{t} \odot \tilde{C}_{t} \\
 h_{t} &= o_{t} \odot \textnormal{tanh}(C_{t})
-\end{align*}
+\end{align}
 where $x_{t}$ is the input vector for timestep $t$, $\sigma$ is the sigmoid activation function and $\odot$ denotes the Hadamard product of matrices. 
 
 \subsection*{Variants}
@@ -92,19 +92,44 @@ Other notable LSTM variants is the Gated Recurrent Unit (GRU), introduced by [Ch
 % Add part for MT?Seems Cho et al. paper for GRU has a bit of reference for SMT
 \section*{Seq2Seq Model}
 % Kalchbrenner and Cho 3 pg. max!!
-The first model that is able to map a sentence into a vector and then to its translation is introduced by [Kalchbrenner et al.]. The model, which they called Recurrent Continuous Translation Models (RCTM), is composed of 2 separate parts: convolutional neural network for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
+\subsection*{Related Works}
+The first model that is able to map a sentence into a vector and then to its translation is introduced by [Kalchbrenner et al.]. The model, which they called Recurrent Continuous Translation Models (RCTM), is composed of 2 separate parts: convolutional neural network (CNN) for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
 % How convolutional layers work, how RNN LM works. Explain 1d Conv in context of CSM.Advantage and disadvantage of RCTM. Explain Cho et al. model. Explain encoder-decoder from Kalchbrenner thesis
 
 The Recurrent Continuous Translation Models estimate the probability distribution over the sentence in the target language given sentences in the source language. Suppose that there exist a target sentence $f = f_{1},f_{2},...,f_{m}$, which is a translation of source sentence $e = e_{1}, e_{2},...,e_{n}$. Then $P(f|e)$ can be obtained with the formula:
-\begin{align*}
+\begin{align} \label{eq:9}
 P(f|e) = \prod_{i=1}^{m} P(f_{i}|f_{1:i-1}, e)
-\end{align*}
+\end{align}
 
 As can be seen in the formulation above, the model estimates $P(f|e)$ by calculating the conditional probability $P(f_{i}|f_{1:i-1}, e)$ for every translated word occuring at position $i$, given the preceding generated words $f_{1:i-1}$ in the target sentence and the source sentence $e$. Conditioning the translation model to the preceding target words also ensure that it incorporates the target language model [Kalchbrenner et al.].
 
-In RCTM, prediction of the target sentence use a language model based on a recurrent neural network [Mikolov et al.]. The recurrent language model predict the $i$-th word of the target sentence depending on all the previous generated words $f_{1:i-1}$, making no Markov assumption about the words dependencies in the target sentence. However, using the standard RNN architecture makes the prediction to be strongly affected by words close to $f_{i}$ and weakly influenced by long-range dependencies that occur in the target language due to the nature of RNN.
+In RCTM, prediction of the target sentence use a language model based on a recurrent neural network [Mikolov et al.]. The recurrent language model (RLM) predict the $i$-th word of the target sentence depending on all the previous generated words $f_{1:i-1}$, making no Markov assumption about the words dependencies in the target sentence. However, using the standard RNN architecture makes the prediction to be strongly affected by words close to $f_{i}$ and weakly influenced by long-range dependencies that occur in the target language due to the nature of RNN.
 
-Describe RLM. dreaming
+The RLM models probability of a sequence of words $f$ that occur in a language, which is denoted by $P(f)$. The equation for $P(f)$ is almost identical to Eq. \ref{eq:9} :
+\begin{align}
+P(f) = \prod_{i=1}^{m} P(f_{i}|f_{1:i-1})
+\end{align}
+It also contains a vocabulary $V$ for words $f_{i}$ of the language and 3 transformation matrices for input vocabulary $\textbf{I}$, recurrent transformation $\textbf{R}$ and output vocabulary transformation $\textbf{O}$. Each word $f_{k} \in V$ is distinguished by one-hot vector $v(f_{k})$. The computation then proceed as follows: 
+\begin{align}
+h_{1} &= g(\textbf{I} \cdot v(f_{1}) + b_{h}) \\
+h_{i+1} &= g(\textbf{R} \cdot h_{i} + \textbf{I} \cdot v(f_{i+1}) + b_{h}) \\
+o_{i+1} &= \textbf{O} \cdot h_{i} + b_{o}
+\end{align}
+
+and the probability distribution is obtained using the softmax function, 
+\begin{align}
+P(f_{i} = v | f_{1:i-1}) = \frac{\exp(o_{i,v})}{\sum_{v=1}^{V}\exp(o_{i,v})}
+\end{align}
+
+where $g$ is a nonlinearity and $\textbf{I} \cdot v(f_{i})$ is a continuous representation of word $f_{i}$.
+
+There are 2 types of conditioning architecture in RCTM using CNN, using convolutional sentence model (CSM) and convolutional $n$-gram model (CGM). The CSM creates sentence representation in a bottom-up manner, using $n$-grams representations in the sentence itself. The hierarchical structure that is created by the model act quite similar like a parse tree in a implicit way. Using this type of structure, the model is able to capture the small, local representations in the lower layers of the model and more globally in the upper layers of the model as it spans more $n$-grams that comprise the sentence representations. This model also offers several advantages as it does not rely on a parse tree [Grefenstette 2011, Socher 2012]. As there exist many languages for which highly accurate and reliable parsers are not available, this model can still be robustly applied. Furthermore, the distribution of translation probability is learned by the model and does not depend on the chosen parse tree.
+
+Using the continuous representations of words in the sentence, CSM models the representation of the sentence by applying sequence of one-dimensional convolution operations. The kernel of the convolutional layers is able to learn pattern within $n$-grams that convey syntactic, semantic or structural information relevant for constructing the sentence representation. After several convolution operations, the sentence vector representation $\textbf{e}$ is created at the topmost layer of the network for the source sentence $e$. This vector representation is then used in the RLM, after applying learned sentence transformation $\textbf{S}$. However, this model has a bias as the RLM tend to predict target sentences with shorter length. The sentence vector representation $\textbf{e}$ also constraint the target words, which is counterintuitive as it often occurs that the target translation has a strong dependencies on some parts of the source sentence and less on the other parts. In order to address these aspects, [Kalchbrenner et al.] also proposes the convolutional $n$-gram model as another conditioning architecture.
+
+The CGM is a truncated version of the CSM, where 
+
+% at end of CGM, connect problem of CSM with Bahdanau!!!
 
 \section*{Recent Advances} % & related work. also include problems with Seq2Seq?
 
