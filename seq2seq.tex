@@ -127,11 +127,15 @@ There are 2 types of conditioning architecture in RCTM using CNN, using convolut
 
 Using the continuous representations of words in the sentence, CSM models the representation of the sentence by applying sequence of one-dimensional convolution operations. The kernel of the convolutional layers is able to learn pattern within $n$-grams that convey syntactic, semantic or structural information relevant for constructing the sentence representation. After several convolution operations, the sentence vector representation $\textbf{e}$ is created at the topmost layer of the network for the source sentence $e$. This vector representation is then used in the RLM, after applying learned sentence transformation $\textbf{S}$. However, this model has a bias as the RLM tend to predict target sentences with shorter length. The sentence vector representation $\textbf{e}$ also constraint the target words, which is counterintuitive as it often occurs that the target translation has a strong dependencies on some parts of the source sentence and less on the other parts. In order to address these aspects, [Kalchbrenner et al.] also proposes the convolutional $n$-gram model as another conditioning architecture.
 
-The CGM is a truncated version of the CSM, where 
-
+The CGM is a truncated version of the CSM, where the $n$-grams representation is extracted from a specific CSM layer for a chosen value of $n$. Using the $n$-grams representation of the source sentence $e$, the CGM can also be inverted to obtain representation for the target sentence $f$ with de-convolutional operation, where the length of the target sentence $m$ is estimated using Poisson distribution. This inverted CGM can also be thought as the truncated version of the inverted CSM for sentence length $m$. Before the inverted CGM unfolds the $n$-gram representation to a target sentence, a learned translation transformation $\textbf{T}$ is applied. The reconstructed vector for the source sentence representation is then added in an incremental manner to the corresponding hidden state $h_{i}$ in the RLM to predict the word $f_{i}$ in the target language. The issue that is addressed with the CGM model, where generation of the target words can now incorporate different parts of the reconstructed source sentence representation, is also later improved by [Bahdanau et al.], where they propose attention mechanism to learn soft-alignment between the source and target sentences.
 % at end of CGM, connect problem of CSM with Bahdanau!!!
 
-\section*{Recent Advances} % & related work. also include problems with Seq2Seq?
+While the model proposed by [Kalchbrenner et al.] works quite well in for rescoring translation hypotheses from SMT system and computing perplexity of reference translations, using CNN as encoder means that the ordering of the words are not preserved. In an almost similar manner to this approach, [Cho et al.] attempt to map source sentence to a fixed vector representation then back to the target sentence, but with 2 RNNs as encoder and decoder. In their work..
+
+\section*{The Seq2Seq Model}
+%Cho and Kalchbrenner didnt attempt direct translation
+
+\section*{Improvement and Recent Advances} % & related work. also include problems with Seq2Seq?
 
 \section*{Conclusion}
 \end{document}
