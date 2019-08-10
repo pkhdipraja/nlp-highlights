@@ -29,7 +29,7 @@
 % FOCUS ON DEVELOPMENT OF SEQ2SEQ OVER TIME AND HOW IT CHANGES
 % Recent Advances: Facebook - Phrase-Based & Neural Unsupervised Machine Translation -> discuss that smt is not dead
 
-Mapping of a sequence to another sequence is an important paradigm because of the vast amount of problems that can be formulated in this manner. For instance, in automatic speech recognition (ASR), chunks of speech signals can be mapped to sequence of phonemes while in machine translation, a sequence of words in one language can be mapped to another language. Interestingly, many other tasks such as text summarization, question answering, and image caption generation can be phrased as a sequence to sequence problem. In this paper, I will attempt to distill how sequence to sequence learning works and the motivation behind it, with a particular focus on machine translation.
+Mapping of a sequence to another sequence is an important paradigm because of the vast amount of problems that can be formulated in this manner. For instance, in automatic speech recognition (ASR), chunks of speech signals can be mapped to sequence of phonemes while in machine translation, a sequence of words in one language can be mapped to another language. Interestingly, many other tasks such as text summarization, question answering, and image caption generation can be phrased as a sequence to sequence problem. In this paper-style essay, I will attempt to distill how sequence to sequence learning works and the motivation behind it, with a particular focus on machine translation.
 
 
 \section*{Introduction}
@@ -83,16 +83,15 @@ h_{t} &= o_{t} \odot \textnormal{tanh}(C_{t})
 \end{align}
 where $x_{t}$ is the input vector for timestep $t$, $\sigma$ is the sigmoid activation function and $\odot$ denotes the Hadamard product of matrices. 
 
-\subsection*{Variants}
+\subsection*{Variants of LSTM}
 %GRU, LSTM with peephole
 Beside the standard LSTM architecture in literature that is introduced above, there also exist several popular variants which are commonly used. One of the variations which is introduced by [Gers, Schmidhueber] use "peephole connections". These connections allow the gates to look into the memory cell state in order to learn precise and stable timings. 
 
 Other notable LSTM variants is the Gated Recurrent Unit (GRU), introduced by [Cho et al.]. Unlike LSTM, GRU is less complex and requires less computation. GRU only have 2 gates, the update gate that decides how much information will be transferred from previous and candidate hidden state to the current one and reset gate that controls to what extent the previous hidden state will affect the candidate hidden state. In this manner, the update gate can be thought as a combination of input and forget gates of LSTM unit. This architecture also merges the internal memory cell and hidden state of LSTM into a single hidden state.
 
 % Add part for MT?Seems Cho et al. paper for GRU has a bit of reference for SMT
-\section*{Seq2Seq Model}
 % Kalchbrenner and Cho 3 pg. max!!
-\subsection*{Related Works}
+\section*{Related Works}
 The first model that is able to map a sentence into a vector and then to its translation is introduced by [Kalchbrenner et al.]. The model, which they called Recurrent Continuous Translation Models (RCTM), is composed of 2 separate parts: convolutional neural network (CNN) for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
 % How convolutional layers work, how RNN LM works. Explain 1d Conv in context of CSM.Advantage and disadvantage of RCTM. Explain Cho et al. model. Explain encoder-decoder from Kalchbrenner thesis
 
@@ -115,12 +114,10 @@ h_{1} &= g(\textbf{I} \cdot v(f_{1}) + b_{h}) \\
 h_{i+1} &= g(\textbf{R} \cdot h_{i} + \textbf{I} \cdot v(f_{i+1}) + b_{h}) \\
 o_{i+1} &= \textbf{O} \cdot h_{i} + b_{o}
 \end{align}
-
 and the probability distribution is obtained using the softmax function, 
 \begin{align}
 P(f_{i} = v | f_{1:i-1}) = \frac{\exp(o_{i,v})}{\sum_{v=1}^{V}\exp(o_{i,v})}
 \end{align}
-
 where $g$ is a nonlinearity and $\textbf{I} \cdot v(f_{i})$ is a continuous representation of word $f_{i}$.
 
 There are 2 types of conditioning architecture in RCTM using CNN, using convolutional sentence model (CSM) and convolutional $n$-gram model (CGM). The CSM creates sentence representation in a bottom-up manner, using $n$-grams representations in the sentence itself. The hierarchical structure that is created by the model act quite similar like a parse tree in a implicit way. Using this type of structure, the model is able to capture the small, local representations in the lower layers of the model and more globally in the upper layers of the model as it spans more $n$-grams that comprise the sentence representations. This model also offers several advantages as it does not rely on a parse tree [Grefenstette 2011, Socher 2012]. As there exist many languages for which highly accurate and reliable parsers are not available, this model can still be robustly applied. Furthermore, the distribution of translation probability is learned by the model and does not depend on the chosen parse tree.
@@ -130,12 +127,32 @@ Using the continuous representations of words in the sentence, CSM models the re
 The CGM is a truncated version of the CSM, where the $n$-grams representation is extracted from a specific CSM layer for a chosen value of $n$. Using the $n$-grams representation of the source sentence $e$, the CGM can also be inverted to obtain representation for the target sentence $f$ with de-convolutional operation, where the length of the target sentence $m$ is estimated using Poisson distribution. This inverted CGM can also be thought as the truncated version of the inverted CSM for sentence length $m$. Before the inverted CGM unfolds the $n$-gram representation to a target sentence, a learned translation transformation $\textbf{T}$ is applied. The reconstructed vector for the source sentence representation is then added in an incremental manner to the corresponding hidden state $h_{i}$ in the RLM to predict the word $f_{i}$ in the target language. The issue that is addressed with the CGM model, where generation of the target words can now incorporate different parts of the reconstructed source sentence representation, is also later improved by [Bahdanau et al.], where they propose attention mechanism to learn soft-alignment between the source and target sentences.
 % at end of CGM, connect problem of CSM with Bahdanau!!!
 
-While the model proposed by [Kalchbrenner et al.] works quite well in for rescoring translation hypotheses from SMT system and computing perplexity of reference translations, using CNN as encoder means that the ordering of the words are not preserved. In an almost similar manner to this approach, [Cho et al.] attempt to map source sentence to a fixed vector representation then back to the target sentence, but with 2 RNNs as encoder and decoder. In their work..
+While the model proposed by [Kalchbrenner et al.] works quite well in for rescoring translation hypotheses from SMT system and computing perplexity of reference translations, using CNN as encoder means that the ordering of the words are not preserved. In an almost similar manner to this approach, [Cho et al.] attempt to map source sentence to a fixed vector representation then back to the target sentence, but with 2 RNNs as encoder and decoder. The encoder RNN reads each word in the source sentence sequentially until it reach the end of the sequence, which is marked by an end-of-sequence (EOS) symbol. The hidden state of RNN after completely reading the source sentence is then encoded to a context vector $\textbf{c}$, which contains the summary of the whole source sentences. Consider source sentence $x$ with length $N$ and target sentence $y$ with length $M$. The encoder is formulated as follows:
+\begin{align}
+h_{t} &= RNN_{enc}(h_{t-1}, \textnormal{emb}(x_{t})) \\
+\textbf{c} &= \textnormal{tanh}(\textbf{V}_{enc} \cdot h_{N})
+\end{align}
+where emb($x_{t}$) is a continuous representation of input word at timestep $t$ and $\textbf{V}_{enc}$ is a learned transformation for the encoder. 
 
-\section*{The Seq2Seq Model}
+On another part, the decoder RNN is a recurrent language model, conditioned on all the previous generated target words and the context vector $\textbf{c}$. It is computed as follows, where the decoder hidden state is initialized using the context vector:
+\begin{align}
+h'_{0} &= \textnormal{tanh}(\textbf{V}_{dec} \cdot \textbf{c}) \\
+h'_{t} &= RNN_{dec}(h'_{t-1}, \textnormal{emb}(y_{t-1}), \textbf{c})
+\end{align}
+where $\textbf{V}_{dec}$ is a learned transformation for the decoder. The probability distribution of target words are obtained from a softmax function applied to the output of a feedforward neural network that consists of a single intermediate layer with maxout units [Goodfellow], using the decoder hidden state, context vector and target word generated from the previous timestep as inputs.
+%generate output using DNN!!
+
+Both of the encoder and decoder use GRU instead of LSTM as it is easier to compute and implement. The encoder and decoder components of the model are then trained in an end-to-end fashion in order to maximize the conditional log-likelihood of the target sentence given the source sentence $P(y|x) = \prod_{t=1}^{M} P(y^{t} | y^{t-1}, y^{t-2},..., x)$. For words representation, one-hot encoding is used to distinguish words in the vocabulary, which are then projected twice, yielding a 100-dimensional embedding for each word. 
+
+In their paper however, they focus on integrating the RNN encoder-decoder pair for conventional phrase-based SMT system. The trained RNN encoder-decoder pair is used to rescore phrase pairs between the source and target sentences. This new score is then added to the existing phrase table and used as additional features in the log-linear model for SMT system. Furthermore, the model is also able to produce well-formed phrases in the target language independently without any influence from the actual phrase table.
+
+% how they integrate enc-dec in smt system? what linguistic features do they learn?
+
+\section*{Seq2Seq Model}
 %Cho and Kalchbrenner didnt attempt direct translation
 
-\section*{Improvement and Recent Advances} % & related work. also include problems with Seq2Seq?
+
+\section*{Improvement to Seq2Seq and Recent Advances} % & related work. also include problems with Seq2Seq?
 
 \section*{Conclusion}
 \end{document}
