@@ -29,6 +29,7 @@
 % FOCUS ON DEVELOPMENT OF SEQ2SEQ OVER TIME AND HOW IT CHANGES
 % Recent Advances: Facebook - Phrase-Based & Neural Unsupervised Machine Translation -> discuss that smt is not dead
 % Cloze task and permutation LM as alternative to decoder LM?
+% Change notation for probability!!
 
 Mapping of a sequence to another sequence is an important paradigm because of the vast amount of problems that can be formulated in this manner. For instance, in automatic speech recognition (ASR), chunks of speech signals can be mapped to sequence of phonemes while in machine translation, a sequence of words in one language can be mapped to another language. Interestingly, many other tasks such as text summarization, question answering, and image caption generation can be phrased as a sequence to sequence problem. In this paper-style essay, I will attempt to distill how sequence to sequence learning works and the motivation behind it, with a particular focus on machine translation.
 
@@ -92,18 +93,18 @@ Other notable LSTM variants is the Gated Recurrent Unit (GRU), introduced by [Ch
 The first model that is able to map a sentence into a vector and then to its translation is introduced by [Kalchbrenner et al.]. The model, which they called Recurrent Continuous Translation Models (RCTM), is composed of 2 separate parts: convolutional neural network (CNN) for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
 % How convolutional layers work, how RNN LM works. Explain 1d Conv in context of CSM.Advantage and disadvantage of RCTM. Explain Cho et al. model. Explain encoder-decoder from Kalchbrenner thesis
 
-The Recurrent Continuous Translation Models estimate the probability distribution over the sentence in the target language given sentences in the source language. Suppose that there exist a target sentence $f = f_{1},f_{2},...,f_{m}$, which is a translation of source sentence $e = e_{1}, e_{2},...,e_{n}$. Then $P(f|e)$ can be obtained with the formula:
+The Recurrent Continuous Translation Models estimate the probability distribution over the sentence in the target language given sentences in the source language. Suppose that there exist a target sentence $f = f_{1},f_{2},...,f_{m}$, which is a translation of source sentence $e = e_{1}, e_{2},...,e_{n}$. Then $p(f|e)$ can be obtained with the formula:
 \begin{align} \label{eq:9}
-P(f|e) = \prod_{i=1}^{m} P(f_{i}|f_{1:i-1}, e)
+p(f|e) = \prod_{i=1}^{m} p(f_{i}|f_{1:i-1}, e)
 \end{align}
 
-As can be seen in the formulation above, the model estimates $P(f|e)$ by calculating the conditional probability $P(f_{i}|f_{1:i-1}, e)$ for every translated word occuring at position $i$, given the preceding generated words $f_{1:i-1}$ in the target sentence and the source sentence $e$. Conditioning the translation model to the preceding target words also ensure that it incorporates the target language model [Kalchbrenner et al.].
+As can be seen in the formulation above, the model estimates $p(f|e)$ by calculating the conditional probability $p(f_{i}|f_{1:i-1}, e)$ for every translated word occuring at position $i$, given the preceding generated words $f_{1:i-1}$ in the target sentence and the source sentence $e$. Conditioning the translation model to the preceding target words also ensure that it incorporates the target language model [Kalchbrenner et al.].
 
 In RCTM, prediction of the target sentence use a language model based on a recurrent neural network [Mikolov et al.]. The recurrent language model (RLM) predict the $i$-th word of the target sentence depending on all the previous generated words $f_{1:i-1}$, making no Markov assumption about the words dependencies in the target sentence. However, using the standard RNN architecture makes the prediction to be strongly affected by words close to $f_{i}$ and weakly influenced by long-range dependencies that occur in the target language due to the nature of RNN.
 
-The RLM models probability of a sequence of words $f$ that occur in a language, which is denoted by $P(f)$. The equation for $P(f)$ is almost identical to Eq. \ref{eq:9} :
+The RLM models probability of a sequence of words $f$ that occur in a language, which is denoted by $p(f)$. The equation for $p(f)$ is almost identical to Eq. \ref{eq:9} :
 \begin{align}
-P(f) = \prod_{i=1}^{m} P(f_{i}|f_{1:i-1})
+p(f) = \prod_{i=1}^{m} p(f_{i}|f_{1:i-1})
 \end{align}
 It also contains a vocabulary $V$ for words $f_{i}$ of the language and 3 transformation matrices for input vocabulary $\textbf{I}$, recurrent transformation $\textbf{R}$ and output vocabulary transformation $\textbf{O}$. Each word $f_{k} \in V$ is distinguished by one-hot vector $v(f_{k})$. The computation then proceed as follows: 
 \begin{align}
@@ -113,7 +114,7 @@ o_{i+1} &= \textbf{O} \cdot h_{i} + b_{o}
 \end{align}
 and the probability distribution is obtained using the softmax function, 
 \begin{align}
-P(f_{i} = v | f_{1:i-1}) = \frac{\exp(o_{i,v})}{\sum_{v=1}^{V}\exp(o_{i,v})}
+p(f_{i} = v | f_{1:i-1}) = \frac{\exp(o_{i,v})}{\sum_{v=1}^{V}\exp(o_{i,v})}
 \end{align}
 where $g$ is a nonlinearity and $\textbf{I} \cdot v(f_{i})$ is a continuous representation of word $f_{i}$.
 
@@ -140,8 +141,11 @@ h'_{t} &= RNN_{dec}(h'_{t-1}, \textnormal{emb}(y_{t-1}), \textbf{c})
 where $\textbf{V}_{dec}$ is a learned transformation for the decoder. The probability distribution of target words are obtained from a softmax function applied to the output of a feedforward neural network that consists of a single intermediate layer with maxout units [Goodfellow], using the decoder hidden state, context vector and target word generated from the previous timestep as inputs.
 %generate output using DNN!!
 
-Both of the encoder and decoder use GRU instead of LSTM as it is easier to compute and implement. The encoder and decoder components of the model are then trained in an end-to-end fashion in order to maximize the conditional log-likelihood of the target sentence given the source sentence $P(y|x) = \prod_{t=1}^{M} P(y^{t} | y^{t-1}, y^{t-2},..., x)$. For words representation, one-hot encoding is used to distinguish words in the vocabulary, which are then projected twice, yielding a 100-dimensional embedding for each word. 
-
+For words representation, one-hot encoding is used to distinguish words in the vocabulary, which are then projected twice, yielding a 100-dimensional embedding for each word.
+Both of the encoder and decoder use GRU instead of LSTM as it is easier to compute and implement. The encoder and decoder components of the model are then trained in an end-to-end fashion in order to estimate the conditional probability of the target sentence given the source sentence: 
+\begin{align}
+p(y|x) = \prod_{t=1}^{M} p(y_{t} | y_{t-1}, y_{t-2},...,y_{1}, \textbf{c}) \label{eq:19}
+\end{align}
 In their paper, they focus on integrating the RNN encoder-decoder pair for conventional phrase-based SMT system. The trained RNN encoder-decoder pair is used to rescore phrase pairs between the source and target sentences. This new score is then added to the existing phrase table and used as additional features in the log-linear model for the phrase-based SMT system. Furthermore, the model is also able to produce well-formed phrases in the target language independently without any influence from the actual phrase table.
 
 % how they integrate enc-dec in smt system? what linguistic features do they learn?
@@ -151,18 +155,34 @@ In their paper, they focus on integrating the RNN encoder-decoder pair for conve
 The works of [Kalchbrenner] and [Cho] however focus only on rescoring and not direct translation, although [Cho] mentions the possibility of replacing phrase table with phrases generated by the RNN encoder-decoder model. [Sutskever et al.] introduces a sequence-to-sequence model, often called "Seq2Seq", which achieves success to produce direct translation from English to French. The Seq2Seq model involves two RNNs as encoder and decoder, similar to [Cho].
 
 
-The task of the encoder is to process the input sequence (source sentence in this case) in a sequential manner until its reaches the end-of-sentence (<EOS>) symbol to generate a fixed-dimensional context vector $\textbf{c}$ that represents the input sequence. It is also important to note that the encoder of Seq2Seq model processes input sequence in reverse. The idea behind reversing the input sequence is to reduce the "minimal time lag" [schmidhueber] problem. By doing this, the distance between first few words in the source and target languages are now much closer to each other, therefore making it easier for backpropagation to relate the source sentence and the target sentence. This method make it easier for the decoder to generate first few words correctly, and in turn improve the probability of generating the correct target translation. The illustration of the input sequence reversal is depicted on Fig..%Illustration
+The task of the encoder is to process the input sequence (source sentence in this case) in a sequential manner until its reaches the end-of-sentence (EOS) symbol to generate a fixed-dimensional context vector $\textbf{c}$ that represents the input sequence. It is also important to note that the encoder of Seq2Seq model processes input sequence in reverse. The idea behind reversing the input sequence is to reduce the "minimal time lag" [schmidhueber] problem. By doing this, the distance between first few words in the source and target languages are now much closer to each other, therefore making it easier for backpropagation to relate the source sentence and the target sentence. This method make it easier for the decoder to generate first few words correctly, and in turn improve the probability of generating the correct target translation. The illustration of the input sequence reversal is depicted on Fig..%Illustration
 
 \newpage % buffer for images
 The decoder architecture of the Seq2Seq model is almost similar to the decoder in the model proposed by [Cho et al.]. It is a recurrent language model, conditioned on all the target words that have been generated until the current timestep and the context vector $\textbf{c}$ that encapsulates all the information contained within the input sequence. The main difference between the Seq2Seq model and the RNN encoder-decoder model is that in Seq2Seq model, the context vector $\textbf{c}$ is only used for initializing the decoder hidden state whereas in the RNN encoder-decoder model, $\textbf{c}$ is used for decoder hidden state initialization and also for target words generation at all timestep, which is indicated in Eq. \ref{eq:18}. 
 
 When the source sentence is already encoded into $\textbf{c}$ and the decoder is set up with the context vector, a special symbol is passed on to the decoder to mark the generation of the output sequence. In the paper, this is an EOS symbol that signifies the end of the input sequence. Afterwards, the decoder will continuously generate words in the target language until it generates the EOS symbol. The architecture of Seq2Seq model is depicted on Fig..
-%Illustration of encoder and decoder model
+%Illustration of encoder and decoder model, with deep layers
 %4 layers deep models, use lstm. paper that shows lstm is better than gru
 % formula, beam search
 % experiment in paper, model analysis pca
+%teacher forcing?
+\newpage
+The encoder and decoder architecture of the Seq2Seq model use LSTM as it is capable of learning long range temporal dependencies. Compared to GRU, LSTM cells consistently performs better on language modelling [Jozefowicz et al. An Empirical Exploration of Recurrent Network Architectures] and machine translation tasks [Thang Luong Massive Exploration of NMT architectures]. The performance of LSTM can also be improved further by setting a large bias to the forget gate. To increase the model capacity, the implementation of Seq2Seq use deep LSTMs (4 layers in the paper) for the encoder and the decoder where the hidden state of encoder final layer at the last timestep is used as context vector $\textbf{c}$ to initialize the first layer of the decoder LSTM. Each additional layer of the deep LSTMs was also found to be able to reduce the perplexity by 10\% [Sutskever et al.]. 
 
-\section*{Seq2Seq Limitation and Recent Advances} % & related work. also include problems with Seq2Seq? also improvement to seq2seq?
+For Seq2Seq, the goal of the model is to estimate the conditional probability of the input sequences given the output sequences:
+\begin{align}
+p(y|x) = \prod_{t=1}^{M} p(y_{t} | \textbf{c}, y_{1},..., y_{t-1})  \label{eq:20}
+\end{align}
+where $M$ is output sequence length which may differ from input sequence length. The formulation of the conditional distribution is almost similar to the RNN encoder-decoder model (Eq. \ref{eq:19}) but with minor difference, where here $\textbf{c}$ is only used to initialize the hidden state of the decoder LSTM and not connected to the decoder at all times. Each distribution $p(y_{t} | \textbf{c}, y_{1},..., y_{t-1})$ in Eq. \ref{eq:20} is produced by a softmax operation over all the existing words in the vocabulary.
+
+Both the encoder and decoder LSTMs are trained in an end-to-end approach to maximize the conditional log-likelihood of the correct translation $T$ given the source sentence $S$, which is defined as the following:
+\begin{align}
+1/ |\mathcal{S}| \sum_{(T,S) \in \mathcal{S}} \textnormal{log}\: p(T|S)
+\end{align}
+where $\mathcal{S}$ is the training set. The most likely translation is approximated by using a left-to-right beam search decoder instead of a greedy search decoder, as greedy decoding only generate most probable word on each timestep which may reduce the overall quality of the predicted translation. During the decoding process, a $B$ number of most probable partial translations (hypotheses) are tracked according to beam size $B$. Each partial hypothesis is extended on each decoder step with all the words in the vocabulary while discarding all but the $B$ most likely partial hypotheses. When the decoder produces the EOS symbol for a hypothesis, it is then removed from the beam search and added to the list of complete hypothesis, while other hypotheses are still explored by the beam search. Additionally, the score of each complete hypothesis is normalized by its length to produce translations with the highest score, due to the bias of the decoding method to select shorter translations.
+
+
+\section*{Seq2Seq Limitation and Recent Advances} % NMT vs SMT as intro..advantages and disadvantages of NMT& related work. also include problems with Seq2Seq? also improvement to seq2seq? Seq2seq in other domain (in paper for MT but already applied to other applications)? advances in NMT? [Effective Approaches to Attention-based NMT Thang luong]. Discuss Encoder-Decoder Model
 
 \section*{Conclusion}
 \end{document}
