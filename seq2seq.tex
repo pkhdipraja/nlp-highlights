@@ -181,8 +181,11 @@ Both the encoder and decoder LSTMs are trained in an end-to-end approach to maxi
 \end{align}
 where $\mathcal{S}$ is the training set. The most likely translation is approximated by using a left-to-right beam search decoder instead of a greedy search decoder, as greedy decoding only generate most probable word on each timestep which may reduce the overall quality of the predicted translation. During the decoding process, a $B$ number of most probable partial translations (hypotheses) are tracked according to beam size $B$. Each partial hypothesis is extended on each decoder step with all the words in the vocabulary while discarding all but the $B$ most likely partial hypotheses. When the decoder produces the EOS symbol for a hypothesis, it is then removed from the beam search and added to the list of complete hypothesis, while other hypotheses are still explored by the beam search. Additionally, the score of each complete hypothesis is normalized by its length to produce translations with the highest score, due to the bias of the decoding method to select shorter translations.
 
+Seq2Seq is the first model that prove that the performance of a pure neural machine translation system is able to surpass a conventional phrase-based SMT system with a significant margin [Sutskever et al.]. The model also surprisingly able to generate high quality translations even on very long sentences, which was initially thought to be difficult due to limited capacity of LSTM memory cell. Furthermore, vector representations that are produced by the encoder component of the Seq2Seq model are aware of the syntactic and semantic information conveyed in the source language.  
+
 
 \section*{Seq2Seq Limitation and Recent Advances} % NMT vs SMT as intro..advantages and disadvantages of NMT& related work. also include problems with Seq2Seq? also improvement to seq2seq? Seq2seq in other domain (in paper for MT but already applied to other applications)? advances in NMT? [Effective Approaches to Attention-based NMT Thang luong]. Discuss Encoder-Decoder Model
+
 
 \section*{Conclusion}
 \end{document}
