@@ -184,7 +184,12 @@ where $\mathcal{S}$ is the training set. The most likely translation is approxim
 Seq2Seq is the first model that prove that the performance of a pure neural machine translation system is able to surpass a conventional phrase-based SMT system with a significant margin [Sutskever et al.]. The model also surprisingly able to generate high quality translations even on very long sentences, which was initially thought to be difficult due to limited capacity of LSTM memory cell. Furthermore, vector representations that are produced by the encoder component of the Seq2Seq model are aware of the syntactic and semantic information conveyed in the source language.  
 
 
-\section*{Seq2Seq Limitation and Recent Advances} % NMT vs SMT as intro..advantages and disadvantages of NMT& related work. also include problems with Seq2Seq? also improvement to seq2seq? Seq2seq in other domain (in paper for MT but already applied to other applications)? advances in NMT? [Effective Approaches to Attention-based NMT Thang luong]. Discuss Encoder-Decoder Model
+\section*{Other Aspects of Seq2Seq and Neural Machine Translation} % NMT vs SMT as intro..advantages and disadvantages of NMT& related work. also include problems with Seq2Seq? also improvement to seq2seq? Seq2seq in other domain (in paper for MT but already applied to other applications)? advances in NMT? [Effective Approaches to Attention-based NMT Thang luong]. Discuss Encoder-Decoder Model
+The aforementioned works [Cho, Kalchbrenner, Sutskever] have drastically changed the field of machine translation. A neural machine translation system offers better performance in term of capturing phrase similarities and long-term dependencies compared to a phrase-based SMT system. In the terms of complexity, a NMT system also requires lesser engineering effort as it requires no feature engineering and applicable to all language pairs without a need for language-specific tailoring. On the other side, NMT approach is less interpretable due to the continuous representations and non-linear properties of neural networks, which causes difficulty in associating hidden states with the language structures and understanding of the translation process.
+
+Seq2Seq, as one of the most promising NMT system at the time of its inception, also still has some limitations on its own. First of all, 
+
+
 
 
 \section*{Conclusion}
