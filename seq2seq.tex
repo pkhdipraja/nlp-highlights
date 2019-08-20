@@ -190,15 +190,22 @@ The aforementioned works [Cho, Kalchbrenner, Sutskever] have drastically changed
 Seq2Seq, as one of the most promising NMT system at the time of its inception, also still has some limitations on its own. First of all, the model only learn long-term dependencies in a left-to-right direction, which means that information from words after the current word are not taken into account. This problem can be fixed by using bidirectional RNNs [Schuster] for the encoder component to read the input sequence from both directions with 2 different RNN cells. Final hidden states from the left-to-right and right-to-left RNNs are concatenated or summed to generate a final context vector, which in turn used to initialize decoder hidden state. Illustration of bidirectional encoder using LSTM cells is depicted on Fig..
 
 %Illustration of BiRNN using LSTM
-Another issue with Seq2Seq and NMT system in general is that the model experiences difficulty in correctly translating rare words because of the limited vocabulary size, which is often attributed to the computationally expensive operation of the softmax function. As a result, a special "UNK" symbol is used to represent every out-of-vocabulary (OOV) word during the decoding process. [Minh-Thang Luong et al.] address this issue by introducing the idea to annotate the training data with alignment information between source and target sentences. The Seq2Seq model is trained on the annotated corpus to keep track of the origins of unknown words that is generated during the translation process, creating links between sentence pairs. The alignment links are used to construct a dictionary, which is used in the post-processing step to replace "UNK" symbol with translation of its corresponding source word. In the case where the translation does not exist in the dictionary, then identity translation is applied.
+Another issue with Seq2Seq and NMT system in general is that the model experiences difficulty in correctly translating rare words because of the limited vocabulary size, which is often attributed to the computationally expensive operation of the softmax function. As a result, a special "UNK" symbol is used to represent every out-of-vocabulary (OOV) word during the decoding process. [Minh-Thang Luong et al.] attempt to address this issue by introducing the idea to annotate the training data with alignment information between source and target sentences. The Seq2Seq model is trained on the annotated corpus to keep track of the origins of unknown words that is generated during the translation process, creating links between sentence pairs. The alignment links are used to construct a dictionary, which is used in the post-processing step to replace "UNK" symbol with translation of its corresponding source word. In the case where the translation does not exist in the dictionary, then identity translation is applied.
 
-In the direction of using smaller unit than words to solve rare words problem, [Sennrich et al.] proposes to encode rare and unknown words as sequences of subword units to achieve open-vocabulary translation. Words that appear in the corpus are segmented using adapted version of Byte Pair Encoding (BPE), where characters are merged instead of bytes. This method initialize the vocabulary with characters and expand the vocabulary content with most frequent character $n$-grams, which are eventually merged into a single symbol. Subsequently, word segments in the vocabulary can be used to train a NMT system.
+In the direction of using units smaller than words to solve rare words problem, [Sennrich et 
+al.] proposed to encode rare and unknown words as sequences of subword units to achieve open-vocabulary translation. Words that appear in the corpus are segmented using adapted version of Byte Pair Encoding (BPE), where characters are merged instead of bytes. This method initialize the vocabulary with characters and expand the vocabulary content with most frequent character $n$-grams, which are eventually merged into a single symbol. Subsequently, word segments in the vocabulary can be used to train a NMT system. Compared with word-level approaches, this technique is able to generate unseen words in the training data. This makes it more appropriate for translation tasks, where morphological changes are often required, in particular for languages that use compounding and agglutination widely.
+
+[Minh Thang-Luong, Manning] also proposed a hybrid model using mixture of words and characters, where the translation task is mostly performed at the word level while utilizing the character components to deal with rare words.
+
+
+
+
 
 
 %solve rare words by increasing effectiveness of softmax, see Gulcehre paper??
 
 
-%addressing rare words in nmt, WordPiece, BPE, other??
+%addressing rare words in nmt, WordPiece (also from korean/jap asr), BPE, achieving open vocabulary nmt with hybrid word-character models, other (short mention of characters and WordPiece)??
 
 %problem with bottleneck, attention augmented decoder
 %attention improve work by Luong et al. (addressing rare words)
