@@ -1,10 +1,12 @@
 \documentclass[12pt]{extarticle}
 \usepackage[utf8]{inputenc}
-\usepackage{cite}
 \usepackage{graphicx}
 \usepackage{subfig}
-
+\usepackage{natbib}
+\bibliographystyle{abbrvnat}
 \graphicspath{ {/home/patrick/Pictures/} }
+\usepackage{hyperref}
+\setcitestyle{authoryear,open={(},close={)}}
 \usepackage{setspace}
 \usepackage{amsmath}
 \usepackage{indentfirst}
@@ -14,6 +16,9 @@
 \date{September 2019}
 \onehalfspacing
 
+\makeatletter
+\renewcommand\hyper@natlinkbreak[2]{#1}
+\makeatother
 \begin{document}
 % Make essay with style of literature review and blogposts
 
@@ -40,14 +45,14 @@ Mapping of a sequence to another sequence is an important paradigm because of th
 
 Prior to neural machine translation (NMT), phrase-based stastistical machine translation (SMT) systems are widely used as it offers reliable performance. Despite its success, most of them are extremely complex and require a huge amount of effort, as it is often tailored to a specific language pair and do not generalize well to another languages. In a phrase-based SMT system, a lot of feature engineering are required in order to capture a specific language phenomena, which prompt researchers to explore another approach. Furthermore, phrase-based systems still experience difficulty in capturing long-term dependencies.
 
-The resurgence of deep neural networks (DNNs) in early 2010s, thanks to faster, parallel computation using GPUs and availability of large and high-quality datasets, bring a new wave of enthusiasm in deep models. With the capability to learn features automatically with multiple, hierarchical representation, DNNs achieve excellent performance on difficult tasks in computer vision [AlexNet] and speech recognition []. Albeit powerful, DNNs has its own limitation, as it requires input and output vectors with a fixed dimension and thus not suitable for sequence to sequence problem whose lengths are unknown beforehand. In addition, DNNs also do not generalize well across temporal patterns, because each neuron has its own specific connection and as a result, a single pattern may look totally different at different timesteps.
+The resurgence of deep neural networks (DNNs) in early 2010s, thanks to faster, parallel computation using GPUs and availability of large and high-quality datasets, bring a new wave of enthusiasm in deep models. With the capability to learn features automatically with multiple, hierarchical representation, DNNs achieve excellent performance on difficult tasks in computer vision \citep{Krizhevsky:2012:ICD:2999134.2999257} and speech recognition \citep{ASR}. Albeit powerful, DNNs has its own limitation, as it requires input and output vectors with a fixed dimension and thus not suitable for sequence to sequence problem whose lengths are unknown beforehand. In addition, DNNs also do not generalize well across temporal patterns, because each neuron has its own specific connection and as a result, a single pattern may look totally different at different timesteps. 
 
-The natural remedy for this problem is to look onto recurrent neural networks (RNNs), as it allows operations over sequences of vectors. However, mapping using RNNs typically have one-to-one correspondence between the input vectors and the output vectors. It also has another problem, as the input and output sequences can have different lengths and non-monotonic alignments. Standard RNN architecture is also not reliable for learning long-range dependencies due to the vanishing gradient problem. This issue is addressed by Sutskever et al. [Seq2Seq], where they introduce a novel and straightforward method to solve general sequence to sequence mapping using Long-Short Term Memory (LSTM) architecture. With the success of sequence to sequence learning in machine translation tasks, research in neural machine translation continue to thrive, eventually resulting in many significant improvements such as attention mechanism [Bahdanau] and subword units to deal with rare words [WordPiece]. But, before delving in too deep, I will give some brief insight into the mechanism behind RNN and LSTM in the next section. 
+The natural remedy for this problem is to look onto recurrent neural networks (RNNs), as it allows operations over sequences of vectors. However, mapping using RNNs typically have one-to-one correspondence between the input vectors and the output vectors. It also has another problem, as the input and output sequences can have different lengths and non-monotonic alignments. Standard RNN architecture is also not reliable for learning long-range dependencies due to the vanishing gradient problem. This issue is addressed by \citep{Sutskever:2014:SSL:2969033.2969173} , where they introduce a novel and straightforward method to solve general sequence to sequence mapping using Long-Short Term Memory (LSTM) architecture. With the success of sequence to sequence learning in machine translation tasks, research in neural machine translation continue to thrive, eventually resulting in many significant improvements such as attention mechanism \citep{DBLP:journals/corr/BahdanauCB14} and subword units to deal with rare words \citep{sennrich-etal-2016-neural}. But, before delving in too deep, I will give some brief insight into the mechanism behind RNN and LSTM in the next section. 
 %followed by?
 
 \section*{Recurrent Neural Networks} % Discuss variants of RNN, LSTM, LSTM highway, GRU?
 
-Recurrent neural networks [Rumelhart] are type of neural network that is able to process arbitrary sequential input via combination of its internal state and input vector. At every timestep $t$, the hidden state vector $h_{t}$ is overwritten as a function of the hidden state at the previous timestep $h_{t-1}$ and the current input vector $x_{t}$. The input vector $x_{t}$ itself could be a representation of $t$-th word in a sentence, which is usually obtained using pre-trained word embeddings [GloVe, Word2Vec, ElMo]. The hidden state of RNNs can be perceived as a memory with a fixed dimensionality that can be tuned, containing distributed representation of the processed input sequence up to time $t$.
+Recurrent neural networks \citep{Rumelhart:1986we} are type of neural network that is able to process arbitrary sequential input via combination of its internal state and input vector. At every timestep $t$, the hidden state vector $h_{t}$ is overwritten as a function of the hidden state at the previous timestep $h_{t-1}$ and the current input vector $x_{t}$. The input vector $x_{t}$ itself could be a representation of $t$-th word in a sentence, which is usually obtained using pre-trained word embeddings \citep{DBLP:journals/corr/abs-1301-3781, pennington-etal-2014-glove, Peters:2018}. The hidden state of RNNs can be perceived as a memory with a fixed dimensionality that can be tuned, containing distributed representation of the processed input sequence up to time $t$. 
 
 In a RNN, the forward step function consists of an affine transformation followed by a non-linear activation function. The hidden state then can be used to make predictions:
 \begin{align}
@@ -56,9 +61,9 @@ y_{t} &= g(W^{(y)}h_{t} + b_{y})
 \end{align}
 where in a typical application, $a$ is the hyperbolic tangent function and $g$ is the softmax function.
 
-Although proven to be effective, RNN still has its own shortcoming. The main problem with RNN is that during training, magnitude of gradient can get weaker or stronger exponentially when backpropagating the error through time, especially with long sequences [Hochreiter, Bengio]. This phenomena is called vanishing or exploding gradient problem, which causes RNN model to experience difficulty when handling "long-term dependencies" that occur in a sequence.
+Although proven to be effective, RNN still has its own shortcoming. The main problem with RNN is that during training, magnitude of gradient can get weaker or stronger exponentially when backpropagating the error through time, especially with long sequences \citep{Hochreiter:1998:VGP:353515.355233, 279181}. This phenomena is called vanishing or exploding gradient problem, which causes RNN model to experience difficulty when handling "long-term dependencies" that occur in a sequence.
 
-Long Short Term Memory (LSTM) architecture [Hochreiter and Schmidhuber] addresses the problem of "long-term dependencies" by integrating a memory cell that is capable to memorize state that span over long sequences of time. The memory cell is controlled by gates, which have the ability to regulate how much information are added or removed in the memory cell. This means that while in a RNN a completely new hidden state is computed at every new timestep, in LSTM the hidden state is not competely overwritten, and updated according to the memory cell. The architecture of both RNNs and LSTMs are depicted in Figure \ref{fig:rnn}.
+Long Short Term Memory (LSTM) architecture \citep{Hochreiter:1997:LSM:1246443.1246450} addresses the problem of "long-term dependencies" by integrating a memory cell that is capable to memorize state that span over long sequences of time. The memory cell is controlled by gates, which have the ability to regulate how much information are added or removed in the memory cell. This means that while in a RNN a completely new hidden state is computed at every new timestep, in LSTM the hidden state is not competely overwritten, and updated according to the memory cell. The architecture of both RNNs and LSTMs are depicted in Figure \ref{fig:rnn}.
 \begin{figure}[ht]
 \centering
 \subfloat[RNN unit]{\includegraphics[scale=1.25]{rnn}} \\
@@ -83,14 +88,14 @@ where $x_{t}$ is the input vector for timestep $t$, $\sigma$ is the sigmoid acti
 
 \subsection*{Variants of LSTM}
 %GRU, LSTM with peephole
-Beside the standard LSTM architecture in literature that is introduced above, there also exist several popular variants which are commonly used. One of the variations which is introduced by [Gers, Schmidhueber] use "peephole connections". These connections allow the gates to look into the memory cell state in order to learn precise and stable timings. 
+Beside the standard LSTM architecture in literature that is introduced above, there also exist several popular variants which are commonly used. One of the variations which is introduced by \citep{DBLP:conf/ijcnn/GersS00} use "peephole connections". These connections allow the gates to look into the memory cell state in order to learn precise and stable timings. 
 
-Other notable LSTM variants is the Gated Recurrent Unit (GRU), introduced by [Cho et al.]. Unlike LSTM, GRU is less complex and requires less computation. GRU only have 2 gates, the update gate that decides how much information will be transferred from previous and candidate hidden state to the current one and reset gate that controls to what extent the previous hidden state will affect the candidate hidden state. In this manner, the update gate can be thought as a combination of input and forget gates of LSTM unit. This architecture also merges the internal memory cell and hidden state of LSTM into a single hidden state.
+Other notable LSTM variants is the Gated Recurrent Unit (GRU), introduced by \citep{cho-etal-2014-learning}. Unlike LSTM, GRU is less complex and requires less computation. GRU only have 2 gates, the update gate that decides how much information will be transferred from previous and candidate hidden state to the current one and reset gate that controls to what extent the previous hidden state will affect the candidate hidden state. In this manner, the update gate can be thought as a combination of input and forget gates of LSTM unit. This architecture also merges the internal memory cell and hidden state of LSTM into a single hidden state.
 
 % Add part for MT?Seems Cho et al. paper for GRU has a bit of reference for SMT
 % Kalchbrenner and Cho 3 pg. max!!
 \section*{Related Works}
-The first model that is able to map a sentence into a vector and then to its translation is introduced by [Kalchbrenner et al.]. The model, which they called Recurrent Continuous Translation Models (RCTM), is composed of 2 separate parts: convolutional neural network (CNN) for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
+The first model that is able to map a sentence into a vector and then to its translation is introduced by \citep{kalchbrenner-blunsom-2013-recurrent-continuous}. The model, which they called Recurrent Continuous Translation Models (RCTM), is composed of 2 separate parts: convolutional neural network (CNN) for modelling the source sentence as the encoder and recurrent neural network for translation generation as a language modelling task, conditioned on the source sentence as the decoder. With this approach, the encoder can capture all the information contained in the source word representations and create a representation of the source sentences. The representation for the source sentences also restraint the generation of the target words in the language modelling phase.
 % How convolutional layers work, how RNN LM works. Explain 1d Conv in context of CSM.Advantage and disadvantage of RCTM. Explain Cho et al. model. Explain encoder-decoder from Kalchbrenner thesis
 
 The Recurrent Continuous Translation Models estimate the probability distribution over the sentence in the target language given sentences in the source language. Suppose that there exist a target sentence $f = f_{1},f_{2},...,f_{m}$, which is a translation of source sentence $e = e_{1}, e_{2},...,e_{n}$. Then $p(f|e)$ can be obtained with the formula:
@@ -98,9 +103,9 @@ The Recurrent Continuous Translation Models estimate the probability distributio
 p(f|e) = \prod_{i=1}^{m} p(f_{i}|f_{1:i-1}, e)
 \end{align}
 
-As can be seen in the formulation above, the model estimates $p(f|e)$ by calculating the conditional probability $p(f_{i}|f_{1:i-1}, e)$ for every translated word occuring at position $i$, given the preceding generated words $f_{1:i-1}$ in the target sentence and the source sentence $e$. Conditioning the translation model to the preceding target words also ensure that it incorporates the target language model [Kalchbrenner et al.].
+As can be seen in the formulation above, the model estimates $p(f|e)$ by calculating the conditional probability $p(f_{i}|f_{1:i-1}, e)$ for every translated word occuring at position $i$, given the preceding generated words $f_{1:i-1}$ in the target sentence and the source sentence $e$. Conditioning the translation model to the preceding target words also ensure that it incorporates the target language model \citep{kalchbrenner-blunsom-2013-recurrent-continuous}.
 
-In RCTM, prediction of the target sentence use a language model based on a recurrent neural network [Mikolov et al.]. The recurrent language model (RLM) predict the $i$-th word of the target sentence depending on all the previous generated words $f_{1:i-1}$, making no Markov assumption about the words dependencies in the target sentence. However, using the standard RNN architecture makes the prediction to be strongly affected by words close to $f_{i}$ and weakly influenced by long-range dependencies that occur in the target language due to the nature of RNN.
+In RCTM, prediction of the target sentence use a language model based on a recurrent neural network \citep{DBLP:conf/interspeech/MikolovKBCK10}. The recurrent language model (RLM) predict the $i$-th word of the target sentence depending on all the previous generated words $f_{1:i-1}$, making no Markov assumption about the words dependencies in the target sentence. However, using the standard RNN architecture makes the prediction to be strongly affected by words close to $f_{i}$ and weakly influenced by long-range dependencies that occur in the target language due to the nature of RNN.
 
 The RLM models probability of a sequence of words $f$ that occur in a language, which is denoted by $p(f)$. The equation for $p(f)$ is almost identical to Eq. \ref{eq:9} :
 \begin{align}
@@ -125,7 +130,7 @@ Using the continuous representations of words in the sentence, CSM models the re
 The CGM is a truncated version of the CSM, where the $n$-grams representation is extracted from a specific CSM layer for a chosen value of $n$. Using the $n$-grams representation of the source sentence $e$, the CGM can also be inverted to obtain representation for the target sentence $f$ with de-convolutional operation, where the length of the target sentence $m$ is estimated using Poisson distribution. This inverted CGM can also be thought as the truncated version of the inverted CSM for sentence length $m$. Before the inverted CGM unfolds the $n$-gram representation to a target sentence, a learned translation transformation $\textbf{T}$ is applied. The reconstructed vector for the source sentence representation is then added in an incremental manner to the corresponding hidden state $h_{i}$ in the RLM to predict the word $f_{i}$ in the target language. The issue that is addressed with the CGM model, where generation of the target words can now incorporate different parts of the reconstructed source sentence representation, is also later improved by [Bahdanau et al.], where they propose attention mechanism to learn soft-alignment between the source and target sentences.
 % at end of CGM, connect problem of CSM with Bahdanau!!!
 
-While the model proposed by [Kalchbrenner et al.] works quite well in for rescoring translation hypotheses from SMT system and computing perplexity of reference translations, using CNN as encoder means that the ordering of the words are not preserved. In an almost similar manner to this approach, [Cho et al.] attempt to map source sentence to a fixed vector representation then back to the target sentence, but with two RNNs as encoder and decoder. The encoder RNN reads each word in the source sentence sequentially until it reach the end of the sequence, which is marked by an end-of-sequence symbol. The hidden state of RNN after completely reading the source sentence is then encoded to a context vector $\textbf{c}$, which contains the summary of the whole source sentences. Consider source sentence $x$ with length $N$ and target sentence $y$ with length $M$. The encoder is formulated as follows:
+While the model proposed by \citep{kalchbrenner-blunsom-2013-recurrent-continuous} works quite well in for rescoring translation hypotheses from SMT system and computing perplexity of reference translations, using CNN as encoder means that the ordering of the words are not preserved. In an almost similar manner to this approach, \citep{cho-etal-2014-learning} attempt to map source sentence to a fixed vector representation then back to the target sentence, but with two RNNs as encoder and decoder. The encoder RNN reads each word in the source sentence sequentially until it reach the end of the sequence, which is marked by an end-of-sequence symbol. The hidden state of RNN after completely reading the source sentence is then encoded to a context vector $\textbf{c}$, which contains the summary of the whole source sentences. Consider source sentence $x$ with length $N$ and target sentence $y$ with length $M$. The encoder is formulated as follows:
 \begin{align}
 h_{t} &= RNN_{enc}(h_{t-1}, \textnormal{emb}(x_{t})) \\
 \textbf{c} &= \textnormal{tanh}(\textbf{V}_{enc} \cdot h_{N})
@@ -138,7 +143,7 @@ h'_{0} &= \textnormal{tanh}(\textbf{V}_{dec} \cdot \textbf{c}) \\
 h'_{t} &= RNN_{dec}(h'_{t-1}, \textnormal{emb}(y_{t-1}), \textbf{c}) 
 \label{eq:18}
 \end{align}
-where $\textbf{V}_{dec}$ is a learned transformation for the decoder. The probability distribution of target words are obtained from a softmax function applied to the output of a feedforward neural network that consists of a single intermediate layer with maxout units [Goodfellow], using the decoder hidden state, context vector and target word generated from the previous timestep as inputs.
+where $\textbf{V}_{dec}$ is a learned transformation for the decoder. The probability distribution of target words are obtained from a softmax function applied to the output of a feedforward neural network that consists of a single intermediate layer with maxout units \citep{Goodfellow:2013:MN:3042817.3043084}, using the decoder hidden state, context vector and target word generated from the previous timestep as inputs.
 %generate output using DNN!!
 
 For words representation, one-hot encoding is used to distinguish words in the vocabulary, which are then projected twice, yielding a 100-dimensional embedding for each word.
@@ -152,13 +157,13 @@ In their paper, they focus on integrating the RNN encoder-decoder pair for conve
 
 \section*{Seq2Seq Model}
 %Cho and Kalchbrenner didnt attempt direct translation. LSTM with multiple layers?
-The works of [Kalchbrenner] and [Cho] however focus only on rescoring and not direct translation, although [Cho] mentions the possibility of replacing phrase table with phrases generated by the RNN encoder-decoder model. [Sutskever et al.] introduces a sequence-to-sequence model, often called "Seq2Seq", which achieves success to produce direct translation from English to French. The Seq2Seq model involves two RNNs as encoder and decoder, similar to [Cho].
+The works of \citep{kalchbrenner-blunsom-2013-recurrent-continuous} and \citep{cho-etal-2014-learning} however focus only on rescoring and not direct translation, although \citep{cho-etal-2014-learning} mentions the possibility of replacing phrase table with phrases generated by the RNN encoder-decoder model. \citep{Sutskever:2014:SSL:2969033.2969173} introduces a sequence-to-sequence model, often called "Seq2Seq", which achieves success to produce direct translation from English to French. The Seq2Seq model involves two RNNs as encoder and decoder, similar to \citep{cho-etal-2014-learning}.
 
 
 The task of the encoder is to process the input sequence (source sentence in this case) in a sequential manner until its reaches the end-of-sentence (EOS) symbol to generate a fixed-dimensional context vector $\textbf{c}$ that represents the input sequence. It is also important to note that the encoder of Seq2Seq model processes input sequence in reverse. The idea behind reversing the input sequence is to reduce the "minimal time lag" [schmidhueber] problem. By doing this, the distance between first few words in the source and target languages are now much closer to each other, therefore making it easier for backpropagation to relate the source sentence and the target sentence. This method make it easier for the decoder to generate first few words correctly, and in turn improve the probability of generating the correct target translation. The illustration of the input sequence reversal is depicted on Fig..%Illustration
 
 \newpage % buffer for images
-The decoder architecture of the Seq2Seq model is almost similar to the decoder in the model proposed by [Cho et al.]. It is a recurrent language model, conditioned on all the target words that have been generated until the current timestep and the context vector $\textbf{c}$ that encapsulates all the information contained within the input sequence. The main difference between the Seq2Seq model and the RNN encoder-decoder model is that in Seq2Seq model, the context vector $\textbf{c}$ is only used for initializing the decoder hidden state whereas in the RNN encoder-decoder model, $\textbf{c}$ is used for decoder hidden state initialization and also for target words generation at all timestep, which is indicated in Eq. \ref{eq:18}. 
+The decoder architecture of the Seq2Seq model is almost similar to the decoder in the RNN encoder-decoder model. It is a recurrent language model, conditioned on all the target words that have been generated until the current timestep and the context vector $\textbf{c}$ that encapsulates all the information contained within the input sequence. The main difference between the Seq2Seq model and the RNN encoder-decoder model is that in Seq2Seq model, the context vector $\textbf{c}$ is only used for initializing the decoder hidden state whereas in the RNN encoder-decoder model, $\textbf{c}$ is used for decoder hidden state initialization and also for target words generation at all timestep, which is indicated in Eq. \ref{eq:18}. 
 
 When the source sentence is already encoded into $\textbf{c}$ and the decoder is set up with the context vector, a special symbol is passed on to the decoder to mark the generation of the output sequence. In the paper, this is an EOS symbol that signifies the end of the input sequence. Afterwards, the decoder will continuously generate words in the target language until it generates the EOS symbol. The architecture of Seq2Seq model is depicted on Fig..
 %Illustration of encoder and decoder model, with deep layers
@@ -167,7 +172,7 @@ When the source sentence is already encoded into $\textbf{c}$ and the decoder is
 % experiment in paper, model analysis pca
 %teacher forcing?
 \newpage
-The encoder and decoder architecture of the Seq2Seq model use LSTM as it is capable of learning long range temporal dependencies. Compared to GRU, LSTM cells consistently performs better on language modelling [Jozefowicz et al. An Empirical Exploration of Recurrent Network Architectures] and machine translation tasks [Thang Luong Massive Exploration of NMT architectures]. The performance of LSTM can also be improved further by setting a large bias to the forget gate. To increase the model capacity, the implementation of Seq2Seq use deep LSTMs (4 layers in the paper) for the encoder and the decoder where the hidden state of encoder final layer at the last timestep is used as context vector $\textbf{c}$ to initialize the first layer of the decoder LSTM. Each additional layer of the deep LSTMs was also found to be able to reduce the perplexity by 10\% [Sutskever et al.]. 
+The encoder and decoder architecture of the Seq2Seq model use LSTM as it is capable of learning long range temporal dependencies. Compared to GRU, LSTM cells consistently performs better on language modelling [Jozefowicz et al. An Empirical Exploration of Recurrent Network Architectures] and machine translation tasks [Thang Luong Massive Exploration of NMT architectures]. The performance of LSTM can also be improved further by setting a large bias to the forget gate. To increase the model capacity, the implementation of Seq2Seq use deep LSTMs (4 layers in the paper) for the encoder and the decoder where the hidden state of encoder final layer at the last timestep is used as context vector $\textbf{c}$ to initialize the first layer of the decoder LSTM. Each additional layer of the deep LSTMs was also found to be able to reduce the perplexity by 10\% \citep{Sutskever:2014:SSL:2969033.2969173}. 
 
 For Seq2Seq, the goal of the model is to estimate the conditional probability of the input sequences given the output sequences:
 \begin{align}
@@ -181,7 +186,7 @@ Both the encoder and decoder LSTMs are trained in an end-to-end approach to maxi
 \end{align}
 where $\mathcal{S}$ is the training set. The most likely translation is approximated by using a left-to-right beam search decoder instead of a greedy search decoder, as greedy decoding only generate most probable word on each timestep which may reduce the overall quality of the predicted translation. During the decoding process, a $B$ number of most probable partial translations (hypotheses) are tracked according to beam size $B$. Each partial hypothesis is extended on each decoder step with all the words in the vocabulary while discarding all but the $B$ most likely partial hypotheses. When the decoder produces the EOS symbol for a hypothesis, it is then removed from the beam search and added to the list of complete hypothesis, while other hypotheses are still explored by the beam search. Additionally, the score of each complete hypothesis is normalized by its length to produce translations with the highest score, due to the bias of the decoding method to select shorter translations.
 
-Seq2Seq is the first model that prove that the performance of a pure neural machine translation system is able to surpass a conventional phrase-based SMT system with a significant margin [Sutskever et al.]. The model also surprisingly able to generate high quality translations even on very long sentences, which was initially thought to be difficult due to limited capacity of LSTM memory cell. Furthermore, vector representations that are produced by the encoder component of the Seq2Seq model are aware of the syntactic and semantic information conveyed in the source language.  
+Seq2Seq is the first model that prove that the performance of a pure neural machine translation system is able to surpass a conventional phrase-based SMT system with a significant margin \citep{Sutskever:2014:SSL:2969033.2969173}. The model also surprisingly able to generate high quality translations even on very long sentences, which was initially thought to be difficult due to limited capacity of LSTM memory cell. Furthermore, vector representations that are produced by the encoder component of the Seq2Seq model are aware of the syntactic and semantic information conveyed in the source language.  
 %teacher forcing???
 
 \section*{Other Aspects of Seq2Seq and Neural Machine Translation} % NMT vs SMT as intro..advantages and disadvantages of NMT& related work. also include problems with Seq2Seq? also improvement to seq2seq? Seq2seq in other domain (in paper for MT but already applied to other applications)? advances in NMT? [Effective Approaches to Attention-based NMT Thang luong]. Discuss Encoder-Decoder Model? multi lingual?
@@ -196,12 +201,6 @@ In the direction of using units smaller than words to solve rare words problem, 
 al.] proposed to encode rare and unknown words as sequences of subword units to achieve open-vocabulary translation. Words that appear in the corpus are segmented using adapted version of Byte Pair Encoding (BPE), where characters are merged instead of bytes. This method initialize the vocabulary with characters and expand the vocabulary content with most frequent character $n$-grams, which are eventually merged into a single symbol. Subsequently, word segments in the vocabulary can be used to train a NMT system. Compared with word-level approaches, this technique is able to generate unseen words in the training data. This makes it more appropriate for translation tasks, where morphological changes are often required, in particular for languages that use compounding and agglutination widely.
 
 [Minh Thang-Luong, Manning] also proposed a hybrid model using mixture of words and characters, where the translation task is mostly performed at the word level while utilizing the character components to deal with rare words.
-
-
-
-
-
-
 %solve rare words by increasing effectiveness of softmax, see Gulcehre paper??
 
 
@@ -211,6 +210,8 @@ al.] proposed to encode rare and unknown words as sequences of subword units to 
 %attention improve work by Luong et al. (addressing rare words)
 
 
-
 \section*{Conclusion}
+
+\newpage
+\bibliography{seq2seq}
 \end{document}
