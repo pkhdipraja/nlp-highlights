@@ -47,8 +47,7 @@ Prior to neural machine translation (NMT), phrase-based stastistical machine tra
 
 The resurgence of deep neural networks (DNNs) in early 2010s, thanks to faster, parallel computation using GPUs and availability of large and high-quality datasets, bring a new wave of enthusiasm in deep models. With the capability to learn features automatically with multiple, hierarchical representation, DNNs achieve excellent performance on difficult tasks in computer vision \citep{Krizhevsky:2012:ICD:2999134.2999257} and speech recognition \citep{ASR}. Albeit powerful, DNNs has its own limitation, as it requires input and output vectors with a fixed dimension and thus not suitable for sequence to sequence problem whose lengths are unknown beforehand. In addition, DNNs also do not generalize well across temporal patterns, because each neuron has its own specific connection and as a result, a single pattern may look totally different at different timesteps. 
 
-The natural remedy for this problem is to look onto recurrent neural networks (RNNs), as it allows operations over sequences of vectors. However, mapping using RNNs typically have one-to-one correspondence between the input vectors and the output vectors. It also has another problem, as the input and output sequences can have different lengths and non-monotonic alignments. Standard RNN architecture is also not reliable for learning long-range dependencies due to the vanishing gradient problem. This issue is addressed by \citep{Sutskever:2014:SSL:2969033.2969173} , where they introduce a novel and straightforward method to solve general sequence to sequence mapping using Long-Short Term Memory (LSTM) architecture. With the success of sequence to sequence learning in machine translation tasks, research in neural machine translation continue to thrive, eventually resulting in many significant improvements such as attention mechanism \citep{DBLP:journals/corr/BahdanauCB14} and subword units to deal with rare words \citep{sennrich-etal-2016-neural}. But, before delving in too deep, I will give some brief insight into the mechanism behind RNN and LSTM in the next section. 
-%followed by?
+The natural remedy for this problem is to look onto recurrent neural networks (RNNs), as it allows operations over sequences of vectors. However, mapping using RNNs typically have one-to-one correspondence between the input vectors and the output vectors. It also has another problem, as the input and output sequences can have different lengths and non-monotonic alignments. Standard RNN architecture is also not reliable for learning long-range dependencies due to the vanishing gradient problem. This issue is addressed by \citep{Sutskever:2014:SSL:2969033.2969173} , where they introduce a novel and straightforward method to solve general sequence to sequence mapping using Long-Short Term Memory (LSTM) architecture. With the success of sequence to sequence learning in machine translation tasks, research in neural machine translation continue to thrive, eventually resulting in many significant improvements such as attention mechanism \citep{DBLP:journals/corr/BahdanauCB14} and subword units to deal with rare words \citep{sennrich-etal-2016-neural}.
 
 \section*{Recurrent Neural Networks} % Discuss variants of RNN, LSTM, LSTM highway, GRU?
 
@@ -64,14 +63,6 @@ where in a typical application, $a$ is the hyperbolic tangent function and $g$ i
 Although proven to be effective, RNN still has its own shortcoming. The main problem with RNN is that during training, magnitude of gradient can get weaker or stronger exponentially when backpropagating the error through time, especially with long sequences \citep{Hochreiter:1998:VGP:353515.355233, 279181}. This phenomena is called vanishing or exploding gradient problem, which causes RNN model to experience difficulty when handling "long-term dependencies" that occur in a sequence.
 
 Long Short Term Memory (LSTM) architecture \citep{Hochreiter:1997:LSM:1246443.1246450} addresses the problem of "long-term dependencies" by integrating a memory cell that is capable to memorize state that span over long sequences of time. The memory cell is controlled by gates, which have the ability to regulate how much information are added or removed in the memory cell. This means that while in a RNN a completely new hidden state is computed at every new timestep, in LSTM the hidden state is not competely overwritten, and updated according to the memory cell. The architecture of both RNNs and LSTMs are depicted in Figure \ref{fig:rnn}.
-\begin{figure}[ht]
-\centering
-\subfloat[RNN unit]{\includegraphics[scale=1.25]{rnn}} \\
-\subfloat[LSTM unit, colah]{\includegraphics[scale=1.4]{lstm}}
-
-\caption{Architecture of RNN (a) and LSTM (b)}
-\label{fig:rnn}
-\end{figure}
 
 A LSTM unit consists of 3 gates (input gate $i_{t}$, forget gate $f_{t}$, output gate $o_{t}$), memory cell $C_{t}$ and hidden state $h_{t}$. In a high-level sense, the input gate decides how much and which values will be updated, the forget gate controls the amount of information to be forgotten in the previous memory cell, and the output gate decides the hidden state by filtering the internal memory cell for each timestep. Each gate produces vectors, where their values are between 0 (completely closed) and 1 (completely open) using the sigmoid activation function. 
 
@@ -85,6 +76,15 @@ C_{t} &= f_{t} \odot C_{t-1} + i_{t} \odot \tilde{C}_{t} \\
 h_{t} &= o_{t} \odot \textnormal{tanh}(C_{t})
 \end{align}
 where $x_{t}$ is the input vector for timestep $t$, $\sigma$ is the sigmoid activation function and $\odot$ denotes the Hadamard product of matrices. 
+
+\begin{figure}[ht]
+\centering
+\subfloat[RNN unit]{\includegraphics[scale=1.25]{rnn}} \\
+\subfloat[LSTM unit]{\includegraphics[scale=1.4]{lstm}}
+
+\caption{Architecture of RNN (a) and LSTM (b)}
+\label{fig:rnn}
+\end{figure}
 
 \subsection*{Variants of LSTM}
 %GRU, LSTM with peephole
@@ -164,19 +164,18 @@ The task of the encoder is to process the input sequence (source sentence in thi
 
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=0.92]{reverse}
+\includegraphics[scale=1.1]{reverse}
 \caption{Reversal of tokens in the input sequence}
 \label{fig:reverse}
 \end{figure}
 
-\newpage % buffer for images
 The decoder architecture of the Seq2Seq model is almost similar to the decoder in the RNN encoder-decoder model. It is a recurrent language model, conditioned on all the target words that have been generated until the current timestep and the context vector $\textbf{c}$ that encapsulates all the information contained within the input sequence. The main difference between the Seq2Seq model and the RNN encoder-decoder model is that in Seq2Seq model, the context vector $\textbf{c}$ is only used for initializing the decoder hidden state whereas in the RNN encoder-decoder model, $\textbf{c}$ is used for decoder hidden state initialization and also for target words generation at all timestep, which is indicated in Eq. \ref{eq:18}. 
 
 When the source sentence is already encoded into $\textbf{c}$ and the decoder is set up with the context vector, a special symbol is passed on to the decoder to mark the generation of the output sequence. In the paper, this is an \textless EOS\textgreater{} symbol that signifies the end of the input sequence. Afterwards, the decoder will continuously generate words in the target language until it generates the \textless EOS\textgreater{} symbol. The architecture of Seq2Seq model is depicted in Figure \ref{fig:seq2seq}.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=0.97]{seq2seq_model}
+\includegraphics[scale=1.1]{seq2seq_model}
 \caption{Sequence-to-sequence network}
 \label{fig:seq2seq}
 \end{figure}
@@ -210,7 +209,7 @@ Seq2Seq, as one of the most promising NMT system at the time of its inception, a
 
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=0.92]{birnn}
+\includegraphics[scale=1.1]{birnn}
 \caption{A single-layer bidirectional LSTM encoder network}
 \label{fig:birnn}
 \end{figure}
@@ -225,19 +224,28 @@ In the direction of using units smaller than words to solve rare words problem, 
 
 The most critical problem with the Seq2Seq model however, is the usage of a single fixed-length context vector. This creates information bottleneck as all the information in the input sequence is encapsulated in the context vector. \citep{DBLP:journals/corr/BahdanauCB14} proposes attention mechanism, where instead of using a single fixed-length vector, the input sequence is encoded into a sequence of vectors and directly linked to the decoder, thus allowing the decoder to choose a subset of vectors in an adaptive manner while decoding the target sequence. This mechanism also allows a model to handle very long output sequences, as the decoder has access to the input sequence at all timesteps through the connections.
 
-The attention mechanism consists of two stages, which are computing the context vector and the attentional vector. First of all, the hidden state of the decoder is compared with individual hidden states in the source sequence to learn attention scores using a feedforward neural network. Apart from feedforward neural network, dot-product \citep{luong-etal-2015-effective} and scaled dot-product \citep{NIPS2017_7181} can also be used as scoring functions. These scores reflects the significance of each source token for generating the output and used to compute the context vector as a weighted average of the hidden states from the source sequence. The context vector is then concatenated with the decoder hidden state and passed through another feedforward neural network to obtain the attentional vector, which is used to produce the target word. Illustration of the attention mechanism is shown in Fig..
+The attention mechanism consists of two stages, which are computing the context vector and the attentional vector. First of all, the hidden state of the decoder is compared with individual hidden states in the source sequence to learn attention scores using a feedforward neural network. Apart from feedforward neural network, dot-product \citep{luong-etal-2015-effective} and scaled dot-product \citep{NIPS2017_7181} can also be used as scoring functions. These scores reflects the significance of each source token for generating the output and used to compute the context vector as a weighted average of the hidden states from the source sequence. The context vector is then concatenated with the decoder hidden state and passed through another feedforward neural network to obtain the attentional vector, which is used to produce the target word. Illustration of the attention mechanism is shown in Figure \ref{fig:attention}.
 
-Intuitively, the attention mechanism can be perceived as a soft alignment between the words in a source sentence and target translation. It allows the model to search and focus only on important information that is relevant for generation of the target word. Furthermore, it is also possible to use attention mechanism without any recurrent network units to perform sequence modelling, using the Transformer architecture \citep{NIPS2017_7181}.%transformer easier to be parallelized compared to rnn?
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=1.1]{attention}
+\caption{Attention mechanism}
+\label{fig:attention}
+\end{figure}
 
+Intuitively, the attention mechanism can be perceived as a soft alignment between the words in a source sentence and target translation. It allows the model to search and focus only on important information that is relevant for generation of the target word. Furthermore, it is possible to use attention mechanism without any recurrent network units to perform sequence modelling, using the Transformer architecture \citep{NIPS2017_7181}.%transformer easier to be parallelized compared to rnn?
 
+Seq2Seq NMT systems are mainly built for a single language pair, which is not effective for multilingual translation due to scaling difficulty with regards to amount of data and training time that is required to support all language pairs. By adding a token to indicate the target language to the input sequence, a single Seq2Seq model is also capable to translate between any two languages \citep{johnson-etal-2017-googles}. The model uses a shared wordpiece model vocabulary \citep{wordpiece} and shared parameters across different languages, allowing implicit bridging (zero-shot translation) between a language pair that has no explicit parallel training data.
+
+NMT systems also rely heavily on large parallel corpora, which is unfortunately sparse for a vast majority of language pairs. \citep{sennrich-etal-2016-improving} proposes automatic generation of sentence pairs using back-translation, where given a monolingual corpus for the target sentences, the target-to-source model is applied to target sentences to generate synthetic source sentences, which in return used for training the source-to-target model. Beside augmenting training sets to improve translation performance, it is possible to use monolingual corpora to perform machine translation in an unsupervised setting \citep{lample-etal-2018-phrase}. In the proposed architecture, language models are trained on both source and target languages using BPE \citep{sennrich-etal-2016-neural} tokens from the joint monolingual corpora. The language models are then incorporated in a translation system which uses iterative back-translation to couple source-to-target and target-to-source model, effectively converting the unsupervised problem to a supervised learning task.
+
+aside MT, show and tell, text summarization, question answering
+
+%multilingual language processing using seq2seq model can also be applied to other areas beside translation.
+%zero shot translation 
 
 %global and local attention, self attention, transformer?
-
-
-
-
 %solve rare words by increasing effectiveness of softmax, see Gulcehre paper??
-
 
 %addressing rare words in nmt, WordPiece (also from korean/jap asr), BPE, achieving open vocabulary nmt with hybrid word-character models, other (short mention of characters and WordPiece)??
 
